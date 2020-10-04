@@ -1,25 +1,22 @@
 const router = require('express').Router()
 const User = require('../models/User')
 const Account = require('../models/Account')
-const auth = require('../middleware/auth')
 const bcrypt = require('bcrypt')
 
 router.post('/users', async (req, res) => {
 
-//Check for missing credidentials
-    const name = req.body.name;
-    const userN = req.body.username;
-    const pwd = req.body.password;
-
-    if (!name || !userN || !pwd) {
-        return res.status(400).json({
-          error: true,
-          message: "Missing name, username or password."
-        });
+    //Make sure credidentials are given and correct
+    if(typeof req.body.name === "undefined" || req.body.name.length < 2 || req.body.name.length > 50) {
+      res.status(400).send({ error: "Invalid name" })
+        return
     }
 
-    //Make sure password is given
-    if(typeof req.body.password === "undefined" || req.body.password.length < 8) {
+    if(typeof req.body.username === "undefined" || req.body.username.length < 2 || req.body.username.length > 50) {
+      res.status(400).send({ error: "Invalid username" })
+        return
+    }
+
+    if(typeof req.body.password === "undefined" || req.body.password.length < 8 || req.body.password.length > 255) {
         res.status(400).send({ error: "Invalid password" })
         return
     }
@@ -27,37 +24,34 @@ router.post('/users', async (req, res) => {
     //Hash the password
     req.body.password = await bcrypt.hash(req.body.password, 10,) 
 
-    
     try {
 
       //Create new user 
       const user = await new User(req.body).save()
-      const user2 = await User.findOne({_id: user.id}).select('-_id -__v -password')
-      delete user.password
-      
-      //.generateAccountNumber()
 
-      //Create neq account for user
+      //Create new account for user
       const account = await new Account({userId: user.id}).save()
 
-      //Inject account into user object
-      user.accounts = [account]
-
-      //Return user
-      res.status(201).send(user)
+      //Return user info
+      res.status(201).send( {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        accounts: [account]
+      })
 
     } catch (e) {
+
+        //Catch duplicate username
+        if(/E11000.*username.*dup key.*/.test(e.message)) {
+          res.status(409).send({error: 'Username already exists'})
+          return
+        }
+
+        //Other errors
         res.status(400).send({error: e.message})
     }
  
 })
-
-
-// View user profile
-router.get('/users/current', auth, async(req, res) => {
-  res.send(req.user)
-})
-
- 
 
 module.exports = router

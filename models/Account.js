@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')  
 require('dotenv').config()
 
-
 module.exports = mongoose.model('Account', mongoose.Schema({
     name:     { type: String, required: true, minlength: 2, maxlength: 50, default: 'Main'},
     number:   { 
@@ -21,13 +20,9 @@ module.exports = mongoose.model('Account', mongoose.Schema({
     //Transform _id to id
     toJSON: { 
         transform: (docIn, docOut) => {
-            docOut.id = docOut._id
             delete docOut._id
             delete docOut.__v
             delete docOut.userId
         }
     }
 }))
-
-//const Account = mongoose.model('Account', accountSchema)
-//module.exports = Account
