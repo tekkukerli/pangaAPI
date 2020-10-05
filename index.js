@@ -12,6 +12,7 @@ const app = express()
 
 //Import routes
 const usersRouter = require('./routes/users')
+const sessionsRouter = require('./routes/sessions')
 
 //Connect to database
 mongoose.connect(process.env.MONGO_URI, {
@@ -29,6 +30,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Attatch routes
 app.use(usersRouter)
+app.use(sessionsRouter)
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`)
