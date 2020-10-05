@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const User = require('../models/User')
 const Session = require('../models/Session')
-const auth = require('../middleware/auth')
 
 //Log in 
 router.post('/sessions', async(req, res) => {
@@ -15,10 +14,11 @@ router.post('/sessions', async(req, res) => {
         }
         const user = await User.findByCredentials(username, password)
         const token = await user.generateAuthToken()
+        const session = await new Session({ userId: user.id, token: token}).save() //saves to database
         res.send( {
             userId: user.id,
             token: token
-
+            
           })
     } catch (error) {
         res.status(401).send({ error: error.message })
@@ -26,15 +26,23 @@ router.post('/sessions', async(req, res) => {
 })
 
 // Log out 
-router.delete('/sessions', auth, async (req, res) => {
+router.delete('/sessions', async (req, res) => {
+    const tokenN = req.header('Authorization')
+    if (!tokenN) return res.status(401).send({error: 'Unauthorised'})
+
+    const token = req.header('Authorization').replace('Bearer ', '')
+
   try {
-      req.user.sessions = req.user.sessions.filter((token) => {
-          return token.token != req.token
-      })
-      await req.user.save()
-      res.status(204).send('No content') 
+    const findSession = await Session.findOne({ 'token': token })
+    if (!findSession) {
+        res.status(422).send({error: 'Did not find valid session'}) 
+    } else {
+        await Session.deleteOne({'token': token })
+        res.status(204).send('No content') 
+    }
+      
   } catch (error) {
-      res.status(500).send(error)
+      res.status(500).send({ error: error.message })
   }
 })
 

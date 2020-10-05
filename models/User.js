@@ -11,14 +11,13 @@ const bcrypt = require('bcrypt')
         type: mongoose.Schema.Types.ObjectId,
         ref: "Account" 
     }],
-
-    
     sessions: [{      
-        token: {
-            type: String,
-            required: true
+        session: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Session" 
         }
     }]
+
 }, {
     //Transform _id to id
     toJSON: { 
@@ -34,7 +33,6 @@ const bcrypt = require('bcrypt')
 userSchema.methods.generateAuthToken = async function() {
     const user = this
     const token = jwt.sign({_id: user._id}, process.env.JWT_KEY)
-    user.sessions = user.sessions.concat({token})
     await user.save()
     return token
 }
