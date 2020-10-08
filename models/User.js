@@ -10,14 +10,7 @@ const bcrypt = require('bcrypt')
     accounts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Account" 
-    }],
-    sessions: [{      
-        session: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Session" 
-        }
     }]
-
 }, {
     //Transform _id to id
     toJSON: { 

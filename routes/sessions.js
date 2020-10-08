@@ -3,7 +3,7 @@ const User = require('../models/User')
 const Session = require('../models/Session')
 
 //Log in 
-router.post('/sessions', async(req, res) => {
+router.post('/', async(req, res) => {
     const userN = req.body.username;
     const pwd = req.body.password;
     try {
@@ -26,7 +26,7 @@ router.post('/sessions', async(req, res) => {
 })
 
 // Log out 
-router.delete('/sessions', async (req, res) => {
+router.delete('/', async (req, res) => {
     const tokenN = req.header('Authorization')
     if (!tokenN) return res.status(401).send({error: 'Unauthorised'})
 

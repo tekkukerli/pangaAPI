@@ -2,9 +2,8 @@ const router = require('express').Router()
 const User = require('../models/User')
 const Account = require('../models/Account')
 const bcrypt = require('bcrypt')
-const auth = require('../middleware/auth')
 
-router.post('/users', async (req, res) => {
+router.post('/', async (req, res) => {
 
     //Make sure credidentials are given and correct
     if(typeof req.body.name === "undefined" || req.body.name.length < 2 || req.body.name.length > 50) {

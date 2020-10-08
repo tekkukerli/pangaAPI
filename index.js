@@ -11,8 +11,8 @@ require('dotenv').config()
 const app = express()
 
 //Import routes
-const usersRouter = require('./routes/users')
-const sessionsRouter = require('./routes/sessions')
+const usersRoute = require('./routes/users')
+const sessionsRoute = require('./routes/sessions')
 
 //Connect to database
 mongoose.connect(process.env.MONGO_URI, {
@@ -29,11 +29,13 @@ app.use(express.json())
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Attatch routes
-app.use(usersRouter)
-app.use(sessionsRouter)
+app.use('/users', usersRoute)  //vaata need üle et / töötaks
+app.use('/sessions', sessionsRoute)
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`)
+
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on http://localhost:` + process.env.PORT)
 })
 
 //see on login branch, testime
