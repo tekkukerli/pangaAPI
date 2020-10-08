@@ -1,18 +1,24 @@
 const express = require('express')
+const app = express()
 const mongoose = require('mongoose')
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs')
 const swaggerDocument = yaml.load('./docs/swagger.yaml');
-const port = "8080"
 
-//Copy env variables to pocess.env
+//Copy env variables to process.env
 require('dotenv').config()
 
-const app = express()
+//Run middlewares
+app.use(express.json())
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Import routes
 const usersRoute = require('./routes/users')
 const sessionsRoute = require('./routes/sessions')
+
+//Attach routes
+app.use('/users', usersRoute)
+app.use('/sessions', sessionsRoute)
 
 //Connect to database
 mongoose.connect(process.env.MONGO_URI, {
@@ -24,18 +30,6 @@ mongoose.connect(process.env.MONGO_URI, {
     console.log('Connected to DB!')
 })
 
-//Run middlewares
-app.use(express.json())
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-//Attatch routes
-app.use('/users', usersRoute)  //vaata need üle et / töötaks
-app.use('/sessions', sessionsRoute)
-
-
-
 app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:` + process.env.PORT)
 })
-
-//see on login branch, testime

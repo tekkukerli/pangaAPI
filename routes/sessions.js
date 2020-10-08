@@ -1,28 +1,13 @@
 const router = require('express').Router()
-const User = require('../models/User')
 const Session = require('../models/Session')
+const userModel = require('../models/User')
 
 //Log in 
-router.post('/', async(req, res) => {
-    const userN = req.body.username;
-    const pwd = req.body.password;
-    try {
-        const { username, password } = req.body
-        
-        if (!userN || !pwd) {
-            return res.status(400).send({error: 'Missing username or password'})
-        }
-        const user = await User.findByCredentials(username, password)
-        const token = await user.generateAuthToken()
-        const session = await new Session({ userId: user.id, token: token}).save() //saves to database
-        res.send( {
-            userId: user.id,
-            token: token
-            
-          })
-    } catch (error) {
-        res.status(401).send({ error: error.message })
-    }
+router.post('/', async(req, res, next) => {
+
+    //Get user by username from DB
+    const user = await userModel.findOne({username: req.body.username})
+
 })
 
 // Log out 
