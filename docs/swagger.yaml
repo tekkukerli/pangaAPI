@@ -16,25 +16,14 @@ paths:
                         schema:
                             $ref: '#/components/schemas/postUsersRequest'
                 required: true
-            tags: []
+            tags:
+                - users
             responses:
                 '201':
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/userObject'
-                            examples:
-                                User has been created:
-                                    value:
-                                        id: 5f79d07a2fdeb07fb0c4d08c
-                                        name: Mari Maasikas
-                                        username: Mari37
-                                        accounts:
-                                            -
-                                                name: Main
-                                                balance: 10000
-                                                currency: EUR
-                                                number: ETCe89857b1
                     description: User has been created
                 '400':
                     content:
@@ -52,17 +41,50 @@ paths:
                                     value:
                                         error: Invalid username
                     description: Bad request
-                '409':
+            summary: Registers a new user
+    /sessions:
+        summary: Logging users in and out
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/postSessionsRequest'
+                required: true
+            tags:
+                - sessions
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/postSessionsResponse'
+                    description: Session token has been created
+                '400':
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/errorResponse'
-                            examples:
-                                Username already exists:
-                                    value:
-                                        error: Username already exists
-                    description: Username already exists
-            summary: Registers a new user
+                    description: Missing username or password
+                '401':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                    description: User does not exist or Wrong password
+            summary: Create new session token for user (login)
+        delete:
+            tags:
+                - sessions
+            responses:
+                '204':
+                    description: Session token has been deleted
+                '401':
+                    description: Unauthorized
+            security:
+                -
+                    Authorization: []
+            summary: Delete session token (log out)
 components:
     schemas:
         postUsersRequest:
@@ -75,7 +97,7 @@ components:
             type: object
             properties:
                 name:
-                    description: User`s full name
+                    description: Users full name
                     type: string
                 username:
                     description: Username
@@ -87,6 +109,57 @@ components:
                 name: Mari Maasikas
                 username: Mari37
                 password: mariparool
+        postSessionsRequest:
+            title: POST /sessions request
+            description: ''
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+            example:
+                username: Juku123
+                password: minuparool
+        postSessionsResponse:
+            title: POST /sessions response
+            description: Session has been created
+            required: []
+            type: object
+            properties:
+                user:
+                    type: object
+                    properties:
+                        _id:
+                            type: string
+                        name:
+                            type: string
+                        username:
+                            type: string
+                        password:
+                            type: string
+                        sessions:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    _id:
+                                        type: string
+                                    token:
+                                        type: string
+                        __v:
+                            format: int32
+                            type: integer
+        deleteSessionsRequest:
+            title: DELETE /sessions request
+            description: ''
+            type: object
+            properties:
+                Authorization:
+                    type: string
+            example:
+                Authorization: >-
+                    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjcyMmQxZGRhYWRiZDVhYTBkOGNhMjYiLCJpYXQiOjE2MDEzMTgxODZ9.HABqtzBwtnVxnIoI16ZTNpgklX72-dYHALTL2GDHy58
         userObject:
             title: userObject
             description: ''
@@ -149,3 +222,7 @@ components:
                     type: string
             example:
                 error: Error message
+    securitySchemes:
+        Authorization:
+            scheme: bearer
+            type: http
