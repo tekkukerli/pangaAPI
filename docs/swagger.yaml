@@ -41,6 +41,16 @@ paths:
                                     value:
                                         error: Invalid username
                     description: Bad request
+                '409':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Username already exists:
+                                    value:
+                                        error: Username already exists
+                    description: Username already exists
             summary: Registers a new user
     /sessions:
         summary: Logging users in and out
@@ -65,22 +75,61 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/errorResponse'
-                    description: Missing username or password
-                '401':
+                            examples:
+                                Invalid username/password:
+                                    value:
+                                        error: Invalid username/password
+                    description: Invalid username/password
+                '404':
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/errorResponse'
-                    description: User does not exist or Wrong password
-            summary: Create new session token for user (login)
+                            examples:
+                                Missing username or password:
+                                    value:
+                                        error: Missing username or password
+                    description: Missing username or password
+            summary: Create new session token for user (log in)
         delete:
             tags:
                 - sessions
             responses:
                 '204':
                     description: Session token has been deleted
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Invalid Authorization header format:
+                                    value:
+                                        error: Invalid Authorization header format
+                    description: Invalid Authorization header format
                 '401':
-                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Missing Authorization header:
+                                    value:
+                                        error: Missing Authorization header
+                                Invalid token:
+                                    value:
+                                        error: Invalid token
+                    description: Missing Authorization header
+                '404':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Invalid session:
+                                    value:
+                                        error: Invalid session
+                    description: Invalid session
             security:
                 -
                     Authorization: []
@@ -119,37 +168,19 @@ components:
                 password:
                     type: string
             example:
-                username: Juku123
-                password: minuparool
+                username: Mari37
+                password: mariparool
         postSessionsResponse:
             title: POST /sessions response
             description: Session has been created
             required: []
             type: object
             properties:
-                user:
-                    type: object
-                    properties:
-                        _id:
-                            type: string
-                        name:
-                            type: string
-                        username:
-                            type: string
-                        password:
-                            type: string
-                        sessions:
-                            type: array
-                            items:
-                                type: object
-                                properties:
-                                    _id:
-                                        type: string
-                                    token:
-                                        type: string
-                        __v:
-                            format: int32
-                            type: integer
+                token:
+                    description: User`s session token
+                    type: string
+            example:
+                token: 5f800e29f3f2d921c8c0ee09
         deleteSessionsRequest:
             title: DELETE /sessions request
             description: ''
@@ -175,10 +206,8 @@ components:
                     description: Username
                     type: string
                 accounts:
+                    $ref: '#/components/schemas/accountObject'
                     description: Array of user`s bank accounts
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/accountObject'
             example:
                 id: 5f79bab312c4877b900f9a55
                 name: Mars
@@ -214,7 +243,7 @@ components:
                 currency: EUR
                 number: ETCed019ead
         errorResponse:
-            title: a generic error response
+            title: error response
             description: Generic error response
             type: object
             properties:

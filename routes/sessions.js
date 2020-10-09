@@ -10,10 +10,15 @@ router.post('/', async(req, res, next) => {
     //Get user by username from DB
     const user = await userModel.findOne({username: req.body.username})
 
+    //Make sure credentials are given
+    if(req.body.username === '' || req.body.password === '' || user === null ) {
+        return res.status(404).json({ error: "Missing username or password" })
+    }
+
     //Validate username and password
     const passwordCheck = await bcrypt.compare(req.body.password, user.password)
     if (!user || !passwordCheck) {
-        return res.status(404).json({error: 'Invalid username/password'})
+        return res.status(400).json({error: 'Invalid username/password'})
     }
 
     //Create session to db

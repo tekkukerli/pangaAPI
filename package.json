@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon -e yaml index.js"
+
   },
   "author": "Kerli Tekku",
   "license": "ISC",
