@@ -1,5 +1,5 @@
+const mongoose = require('mongoose')
 const sessionModel = require('./models/Session')
-
 exports.verifyToken = async (req, res, next) => {
 
     //Check Authorization header is provided
@@ -13,10 +13,13 @@ exports.verifyToken = async (req, res, next) => {
 
     //Check Authorization header for token
     if(!authorizationHeader[1]) {
-        return res.send(400).json({error: 'Invalid Authorization header format'})
+        return res.status(400).json({error: 'Invalid Authorization header format'})
     }
 
-    //Validate token
+    //Validate token is in mongo ObjectId
+    if (!mongoose.Types.ObjectId.isValid(authorizationHeader[1])) {
+        return res.status(401).json({error: 'Invalid token'})
+    }
     const session = await sessionModel.findOne({_id: authorizationHeader[1]})
     if (!session) return res.status(401).json({error: 'Invalid token'})
 
