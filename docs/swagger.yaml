@@ -16,7 +16,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/postUsersRequest'
                 required: true
-            tags: []
+            tags:
+                - users
             responses:
                 '201':
                     content:
@@ -141,8 +142,8 @@ components:
                 currency: EUR
                 number: ETCed019ead
         errorResponse:
-            title: a generic error response
-            description: Generic error response
+            title: error response
+            description: error response
             type: object
             properties:
                 error:
