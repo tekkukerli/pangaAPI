@@ -92,7 +92,7 @@ paths:
             tags:
                 - sessions
             responses:
-                '200':
+                '201':
                     content:
                         application/json:
                             schema:
