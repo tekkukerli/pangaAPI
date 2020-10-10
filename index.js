@@ -15,10 +15,12 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //Import routes
 const usersRoute = require('./routes/users')
 const sessionsRoute = require('./routes/sessions')
+const transactionsRoute = require('./routes/transactions')
 
 //Attach routes
 app.use('/users', usersRoute)
 app.use('/sessions', sessionsRoute)
+app.use('/transactions', transactionsRoute)
 
 //Connect to database
 mongoose.connect(process.env.MONGO_URI, {
