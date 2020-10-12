@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs')
 const swaggerDocument = yaml.load('./docs/swagger.yaml');
+const {processTransactions} = require('./middlewares')
 
 //Copy env variables to process.env
 require('dotenv').config()
@@ -31,6 +32,10 @@ mongoose.connect(process.env.MONGO_URI, {
 }, ()=>{
     console.log('Connected to DB!')
 })
+
+processTransactions()
+
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:` + process.env.PORT)

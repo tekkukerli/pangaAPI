@@ -1,11 +1,11 @@
 const router = require('express').Router()
-//const sessionModel = require('../models/Session')
-//const userModel = require('../models/User')
 const accountModel = require('../models/Account')
 const bankModel = require('../models/Bank')
+const userModel = require('../models/User')
 const {verifyToken} = require('../middlewares')
 const fetch = require('node-fetch')
 require('dotenv').config()
+const transactionModel = require('../models/Transaction')
 
 //Log in 
 router.post('/',verifyToken, async(req, res, next) => {
@@ -34,19 +34,59 @@ router.post('/',verifyToken, async(req, res, next) => {
     }
 
     const bankToPrefix = req.body.accountTo.slice(0,3)
-    const bankTo = await bankModel.findOne({bankToPrefix: bankToPrefix})
+    let bankTo = await bankModel.findOne({bankPrefix: bankToPrefix})
 
     //Check destination bank
     if (!bankTo) {
-        await fetch(`${process.env.CENTRAL_BANK_URL}/banks`, {
+        console.log('Destination bank NOT was found in cache')
+        const banks = await fetch(`${process.env.CENTRAL_BANK_URL}/banks`, {
             headers: {'Api-Key': process.env.CENTRAL_BANK_API_KEY}
         })
-            .then(responseText => responseText.text())
-            .then(json => console.log(json));
+            .then(responseText => responseText.json())
+
+        //Delete all old banks
+        await bankModel.deleteMany()
+
+        //Create new bulk object
+        const bulk = bankModel.collection.initializeUnorderedBulkOp();
+
+        //Add banks to queue to be inserted into DB
+        banks.forEach(bank => {
+            bulk.insert(bank);
+        })
+
+        //Start bulk insert
+        await bulk.execute();
+
+       // console.log(await bankModel.find());
+
+        //Try getting the details of the destination bank again
+        bankTo = await bankModel.findOne({bankPrefix: bankToPrefix})
+
+        //Check for destination bank once more
+        if(!bankTo){
+            return res.status(400).json ({error: 'Invalid accountTo'})
+        }
+
+    } else {
+        console.log('Destination bank was found in cache')
     }
 
+    //console.log(bankTo);
 
-    return res.status(200).json({})
+    //Make new transaction
+    const transaction = transactionModel.create({
+        userId: req.userId,
+        amount: req.body.amount,
+        currency: accountFromObject.currency,
+        accountFrom: req.body.accountFrom,
+        accountTo: req.body.accountTo,
+        explanation: req.body.explanation,
+        senderName: (await userModel.findOne({_id: req.userId})).name
+    })
+
+
+    return res.status(200).json()
 })
 
 
