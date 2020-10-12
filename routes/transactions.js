@@ -1,12 +1,14 @@
 const router = require('express').Router()
 //const sessionModel = require('../models/Session')
 //const userModel = require('../models/User')
-//const accountModel = require('../models/Account')
+const accountModel = require('../models/Account')
 const bankModel = require('../models/Bank')
 const {verifyToken} = require('../middlewares')
+const fetch = require('node-fetch')
+require('dotenv').config()
 
 //Log in 
-router.post('/', async(req, res, next) => {
+router.post('/',verifyToken, async(req, res, next) => {
 
     //Get account data from DB
     const accountFromObject = await accountModel.findOne({number: req.body.accountFrom})
@@ -17,7 +19,7 @@ router.post('/', async(req, res, next) => {
     }
 
     //Check that accountFrom belongs to the user
-    if(accountFromObject.userId !== req.userId){
+    if(accountFromObject.userId.toString() !== req.userId.toString()){
         return res.status(403).json({error: 'Forbidden'})
     }
 
@@ -31,8 +33,17 @@ router.post('/', async(req, res, next) => {
         return res.status(400).json({error: 'Invalid amount'})
     }
 
+    const bankToPrefix = req.body.accountTo.slice(0,3)
+    const bankTo = await bankModel.findOne({bankToPrefix: bankToPrefix})
+
     //Check destination bank
-    const banks = bankModel.find()
+    if (!bankTo) {
+        await fetch(`${process.env.CENTRAL_BANK_URL}/banks`, {
+            headers: {'Api-Key': process.env.CENTRAL_BANK_API_KEY}
+        })
+            .then(responseText => responseText.text())
+            .then(json => console.log(json));
+    }
 
 
     return res.status(200).json({})
