@@ -165,6 +165,76 @@ paths:
                 -
                     Authorization: []
             summary: Delete session token (log out)
+    /transactions:
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/postTransactionsRequest'
+                required: true
+            tags:
+                - transactions
+            responses:
+                '201':
+                    content:
+                        application/json: {}
+                    description: Transaction has been successfully queued for processing
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                invalidAmount:
+                                    value:
+                                        error: Invalid amount
+                                invalidAccountTo:
+                                    value:
+                                        error: Invalid accountTo
+                    description: Invalid amount
+                '401':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                missingAuthorizationHeader:
+                                    value: "\t{\"error\":\"Missing authorizzation header\"}"
+                    description: Unauthorized
+                '402':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                insufficinentFunds:
+                                    value:
+                                        error: Insufficient funds
+                    description: Payment required
+                '403':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                forbidden:
+                                    value:
+                                        error: Forbidden
+                    description: The accountFrom does not belong to the user
+                '404':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                accountNotFound:
+                                    value:
+                                        error: Account not found
+                    description: Account not found
+            security:
+                -
+                    Authorization: []
 components:
     schemas:
         postUsersRequest:
@@ -302,7 +372,33 @@ components:
                 balance: 100000
                 currency: EUR
                 number: ETCe00fd669b985804f27dc29ae257d218e
+        postTransactionsRequest:
+            title: POST /transactions request
+            description: ''
+            type: object
+            properties:
+                accountFrom:
+                    description: Sender`s bank account
+                    type: string
+                accountTo:
+                    description: Receiver`s bank account
+                    type: string
+                amount:
+                    format: int32
+                    description: The sum
+                    type: integer
+                explanation:
+                    description: Purpose of the transaction
+                    type: string
+            example:
+                accountFrom: 1567e05d70419f9d635a24794dde08b38c0
+                accountTo: feb30297826
+                amount: 150
+                explanation: money for food
     securitySchemes:
         Authorization:
+            scheme: bearer
+            type: http
+        JWT:
             scheme: bearer
             type: http
