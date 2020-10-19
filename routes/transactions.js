@@ -20,7 +20,7 @@ router.post('/', verifyToken, async(req, res, next) => {
         return res.status(404).json({error: 'Account not found'})
     }
 
-    //Check that accountFrom belongs to the user
+    //Check that accountFrom belongs to the user      -- kust tuleb siia req.userId ????
     if (accountFromObject.userId.toString() !== req.userId.toString()) {
         return res.status(403).json({error: 'Forbidden'})
     }
