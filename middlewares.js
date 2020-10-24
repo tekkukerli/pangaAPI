@@ -15,6 +15,7 @@ exports.verifyToken = async (req, res, next) => {
     //Check Authorization header is provided
     let authorizationHeader = req.header('Authorization')
    // console.log(authorizationHeader);
+    console.log(req.headers);
     if (!authorizationHeader) {
         return res.status(401).json({error: 'Missing Authorization header'})
     }
@@ -135,7 +136,7 @@ exports.processTransactions = async () => {
             format: 'compact'
         }, key).update(JSON.stringify(transaction)).final()
 
-        console.log(jwt)
+       // console.log(jwt)
 
         //Send request to remote bank
         try {
@@ -203,7 +204,8 @@ exports.processTransactions = async () => {
         //Log bad responses from server to transaction statusDetail
         if (serverResponseAsObject.status < 200 || serverResponseAsObject.status >= 300) {
             console.log('Server response was ' + serverResponseAsObject.status);
-            console.log('Server reason was ' + serverResponseAsObject.statusText);
+            console.log('Server reason was ' + serverResponseAsObject.statusText);    //hiljem enda lisatud
+
             transaction.status = 'failed'
             transaction.statusDetail = typeof serverResponseAsJson.error !== 'undefined' ?
                 serverResponseAsJson.error : serverResponseAsPlainText
