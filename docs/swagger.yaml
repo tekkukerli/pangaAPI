@@ -1,0 +1,152 @@
+openapi: 3.0.2
+info:
+    title: Kerli pangaAPI
+    version: 1.0.0
+servers:
+    -
+        url: 'http://localhost:8080'
+        description: Local development server
+paths:
+    /users:
+        summary: User related operations
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/postUsersRequest'
+                required: true
+            tags:
+                - users
+            responses:
+                '201':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/userObject'
+                            examples:
+                                User has been created:
+                                    value:
+                                        id: 5f79d07a2fdeb07fb0c4d08c
+                                        name: Mari Maasikas
+                                        username: Mari37
+                                        accounts:
+                                            -
+                                                name: Main
+                                                balance: 10000
+                                                currency: EUR
+                                                number: ETCe89857b1
+                    description: User has been created
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Invalid password:
+                                    value:
+                                        error: Invalid password
+                                Invalid name:
+                                    value:
+                                        error: Invalid name
+                                Invalid username:
+                                    value:
+                                        error: Invalid username
+                    description: Bad request
+                '409':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Username already exists:
+                                    value:
+                                        error: Username already exists
+                    description: Username already exists
+            summary: Registers a new user
+components:
+    schemas:
+        postUsersRequest:
+            title: POST /users request
+            description: ''
+            required:
+                - name
+                - username
+                - password
+            type: object
+            properties:
+                name:
+                    description: User`s full name
+                    type: string
+                username:
+                    description: Username
+                    type: string
+                password:
+                    description: Password
+                    type: string
+            example:
+                name: Mari Maasikas
+                username: Mari37
+                password: mariparool
+        userObject:
+            title: userObject
+            description: ''
+            type: object
+            properties:
+                id:
+                    description: User´s ID
+                    type: string
+                name:
+                    description: User`s full name
+                    type: string
+                username:
+                    description: Username
+                    type: string
+                accounts:
+                    description: Array of user`s bank accounts
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/accountObject'
+            example:
+                id: 5f79bab312c4877b900f9a55
+                name: Mars
+                username: Mari2
+                accounts:
+                    -
+                        name: Main
+                        balance: 10000
+                        currency: EUR
+                        number: ETC0e861235
+                        id: 5f79bab412c4877b900f9a56
+        accountObject:
+            title: accountObject
+            description: ''
+            type: object
+            properties:
+                name:
+                    description: Account name
+                    type: string
+                balance:
+                    format: int32
+                    description: Funds the account holds
+                    type: integer
+                currency:
+                    description: Funds currency
+                    type: string
+                number:
+                    description: Account number
+                    type: string
+            example:
+                name: Main
+                balance: 10000
+                currency: EUR
+                number: ETCed019ead
+        errorResponse:
+            title: error response
+            description: error response
+            type: object
+            properties:
+                error:
+                    type: string
+            example:
+                error: Error message

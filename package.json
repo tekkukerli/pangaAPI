@@ -1,0 +1,24 @@
+{
+  "name": "kerli-bank-api",
+  "description": "Kerli Tekku bank API",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon -e yaml, js index.js"
+  },
+  "author": "Kerli Tekku",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "md5": "^2.3.0",
+    "mongodb": "^3.2.7",
+    "mongoose": "^5.7.5",
+    "nodemon": "^1.19.1",
+    "swagger-ui-express": "^4.1.4",
+    "yamljs": "^0.3.0"
+  }
+}
