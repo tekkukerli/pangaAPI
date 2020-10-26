@@ -15,8 +15,8 @@ module.exports = mongoose.model('Transaction', new mongoose.Schema({
 }, {
     toJSON: {
         transform: function (docIn, docOut) {
-            docOut.id = docOut._id
-            delete docOut._id;
+            //docOut.id = docOut._id
+            //delete docOut._id;
         }
     }
 }))

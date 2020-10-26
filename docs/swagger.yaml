@@ -180,17 +180,17 @@ paths:
                                             -
                                                 senderName: Mari Maasikas
                                                 accountFrom: 8b9a7cfefd4d642f9a6be0ca537f5b6ec83
-                                                receiverName: Karl Kaalikas
+                                                amount: 600
                                                 accountTo: 8b9844e7ca913f1aae49e0223101068989e
-                                                amount: 1500
-                                                createdAt: '2020-10-26T09:16:02.164Z'
+                                                createdAt: '2020-10-26T21:01:25.057Z'
+                                                receiverName: Karl Kaalikas
                                             -
                                                 senderName: Mari Maasikas
                                                 accountFrom: 8b9a7cfefd4d642f9a6be0ca537f5b6ec83
-                                                receiverName: Karl Kaalikas
-                                                accountTo: 8b9844e7ca913f1aae49e0223101068989e
                                                 amount: 1800
+                                                accountTo: 8b9844e7ca913f1aae49e0223101068989e
                                                 createdAt: '2020-10-26T09:24:40.289Z'
+                                                receiverName: Karl Kaalikas
                     description: OK
             security:
                 -

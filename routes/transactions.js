@@ -74,14 +74,14 @@ router.post('/', verifyToken, async(req, res, next) => {
     //Make new transaction
     console.log("Creating transaction...")
     const transaction = transactionModel.create({
-        userId:      req.userId,
-        amount:      req.body.amount,
-        currency:    accountFromObject.currency,
+        senderName:  (await userModel.findOne({_id: req.userId})).name,
         accountFrom: req.body.accountFrom,
-        accountTo:   req.body.accountTo,
+        amount:      req.body.amount,
+        userId:      req.userId,
+        currency:    accountFromObject.currency,
         explanation: req.body.explanation,
         statusDetail,
-        senderName:  (await userModel.findOne({_id: req.userId})).name
+        accountTo:   req.body.accountTo
     })
 
 
@@ -229,15 +229,15 @@ router.post('/b2b', async (req, res, next) => {
 
     // Create transaction
     await transactionModel.create({
-        userId:      accountTo.userId,
-        amount:      transaction.amount,
-        currency:    transaction.currency,
-        accountFrom: transaction.accountFrom,
-        accountTo:   transaction.accountTo,
-        explanation: transaction.explanation,
         senderName:  transaction.senderName,
+        accountFrom: transaction.accountFrom,
         receiverName:  accountToOwner.name,
-        status: 'completed'
+        amount:      transaction.amount,
+        userId:      accountTo.userId,
+        currency:    transaction.currency,
+        explanation: transaction.explanation,
+        status: 'completed',
+        accountTo:   transaction.accountTo
     })
 
     // Send receiverName
@@ -266,23 +266,12 @@ router.get('/',verifyToken, async (req, res, next) => {
     //Get user object from DB
     const user = await userModel.findOne({_id: req.userId})
 
-
     //Get user`s transactions
-    const transactions = await transactionModel.find({userId: req.userId})
+    const transactions = await transactionModel.find({userId: req.userId},{senderName: 1, accountFrom: 1, receiverName: 1, accountTo: 1, amount: 1, createdAt: 1, _id: 0})
 
     res.status(200).send( {
         name: user.name,
         transactions: transactions
-
-        /*
-            senderName: transactions.senderName,
-            accountFrom: transactions.accountFrom,
-            receiverName: transactions.receiverName,
-            accountTo: transactions.accountTo,
-            amount: transactions.amount,
-            createdAt: transactions.createdAt
-        */
-
     })
 
 })
