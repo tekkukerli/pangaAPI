@@ -4,14 +4,14 @@ info:
     version: 1.0.0
 servers:
     -
-        url: 'http://localhost:8080'
-        description: Local development server
-    -
         url: 'https://kerliarendab.xyz'
         description: Production server
+    -
+        url: 'http://localhost:8080'
+        description: Local development server
 paths:
     /users:
-        summary: User related operations
+        description: User related operations
         post:
             requestBody:
                 content:
@@ -84,7 +84,6 @@ paths:
                     Authorization: []
             summary: Returns currently logged in user´s data
     /sessions:
-        summary: Logging users in and out
         post:
             requestBody:
                 content:
@@ -200,7 +199,8 @@ paths:
                                 $ref: '#/components/schemas/errorResponse'
                             examples:
                                 missingAuthorizationHeader:
-                                    value: "\t{\"error\":\"Missing authorizzation header\"}"
+                                    value:
+                                        error: Missing authorizzation header
                     description: Unauthorized
                 '402':
                     content:
@@ -235,6 +235,92 @@ paths:
             security:
                 -
                     Authorization: []
+            summary: Transfer funds
+    /transactions/b2b:
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/postTransactionsb2bRequest'
+                required: true
+            tags:
+                - transactions
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            examples:
+                                receiverName:
+                                    value:
+                                        receiverName: Karl Kaalikas
+                    description: 'Transaction was successful, money was transferred to '
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Parsing JWT payload failed:
+                                    value:
+                                        error: 'Parsing JWT payload failed: '
+                                The account sending the funds does not belong to a bank registered in Central Bank:
+                                    value:
+                                        error: >-
+                                            The account sending the funds does not belong to a bank registered
+                                            in Central Bank
+                                'Cannot verify your signature: The jwksUrl of your bank is invalid:':
+                                    value:
+                                        error: >-
+                                            Cannot verify your signature: The jwksUrl of your bank  is
+                                            invalid:
+                                Invalid signature:
+                                    value:
+                                        error: Invalid signature
+                    description: Parsing JWT payload failed
+                '404':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Account not found:
+                                    value:
+                                        error: Account not found
+                    description: Account not found
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                'Cannot verify your signature: The jwksUrl of your bank is missing':
+                                    value:
+                                        error: 'Cannot verify your signature: The jwksUrl of your bank is missing'
+                    description: 'Cannot verify your signature: The jwksUrl of your bank is missing'
+                '502':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/errorResponse'
+                            examples:
+                                Central Bank error:
+                                    value:
+                                        error: 'Central Bank error: '
+                    description: Central Bank error
+            summary: Accepts external bank transfers
+    /transactions/jwks:
+        get:
+            tags:
+                - transactions
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/getTransactionsJwksResponse'
+                    description: Successful operation
+            summary: Get bank public key
 components:
     schemas:
         postUsersRequest:
@@ -391,14 +477,49 @@ components:
                     description: Purpose of the transaction
                     type: string
             example:
-                accountFrom: 1567e05d70419f9d635a24794dde08b38c0
-                accountTo: feb30297826
-                amount: 150
+                accountFrom: 8b9a7cfefd4d642f9a6be0ca537f5b6ec83
+                accountTo: 8b9844e7ca913f1aae49e0223101068989e
+                amount: 1500
                 explanation: money for food
+        postTransactionsb2bRequest:
+            title: POST /transactions/b2b request
+            description: ''
+            type: object
+            properties:
+                jwt:
+                    description: Jason Web Token that contains the transaction information
+                    type: string
+            example:
+                jwt: >-
+                    eyJhbGciOiJSUzI1NiIsImtpZCI6IklQcElnMVhwMEhKbHpVME04dExwd25wYlZNX3NvYUFOUG5CRmQweWJTN1EifQ.eyJhY2NvdW50RnJvbSI6IjhiOWE3Y2ZlZmQ0ZDY0MmY5YTZiZTBjYTUzN2Y1YjZlYzgzIiwiYWNjb3VudFRvIjoiOGI5ODQ0ZTdjYTkxM2YxYWFlNDllMDIyMzEwMTA2ODk4OWUiLCJjdXJyZW5jeSI6IkVVUiIsImFtb3VudCI6MTIwMDAsImV4cGxhbmF0aW9uIjoiYmlsbHMiLCJzZW5kZXJOYW1lIjoiTWFyaSBNYWFzaWthcyJ9.dNlBEmEddabpUvZ9V7MHx7A47YhzSWBg1vrx0XwfqLPDZ5dVqOp7nj22_YLmwH1Afv12qoRnz2IOR4dVmBMUT0QUh-5Cm2uJ9go72EWwUi6eJ3LpzaVvYlFU6UE6wAmEqW2O8E33a5XgHqpWoRY3h9v3AE2VRXWdecFnkLAUzcABvor7uxPlyi-TzNhdWvtaMqK7Jiuo3ud9-sKPu4U15VPF1dnR6FhbCn6Zakt8Vk9Fvo2UeXYspjIyDUEBKP4QHLkDRi5wPB76MFCgFo9wXjFdCFKWbrgapqnwTZN3phLQgqZ1Aj6M-Por7LaxJFQ57B1bTg4su4pigsyZyShD9A
+        getTransactionsJwksResponse:
+            title: GET /transactions/jwks response
+            description: ''
+            type: object
+            properties:
+                keys:
+                    description: public key
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            kty:
+                                type: string
+                            kid:
+                                type: string
+                            'n':
+                                type: string
+                            e:
+                                type: string
+            example:
+                keys:
+                    -
+                        kty: RSA
+                        kid: IPpIg1Xp0HJlzU0M8tLpwnpbVM_soaANPnBFd0ybS7Q
+                        'n': >-
+                            wLq2c-NIZvXY3YnoO6hWDrE0dFgcX6aw7Km4US1VTbAOMwpAnIqnxg7lvINFkPjtpKYpHC0f4tgJYY1hEvdvO5YFX2f6iKzS0_PqNosJOf2-4Xpi7sva8AQiAIlPZkSVKpB0jjIgN184EUVDIm9giIIUqnJsCYdBHBOTFR8UyCQtRwyPNUAfr9neCsHXlXnlicYfN7dqOcaX7w-XAJQmWhvQ_EVbvV2_xwlL7D-Dd_6zriEfD8xzB4mZ-Dg73KVbnvgfHM4vSyClen-qnhJVyVg3PDUOsFin_muISuI0PdJ-1AkoAcRerfGmeEw0rGSOsSvaNOo1_FGOkkIsOBr_iw
+                        e: AQAB
     securitySchemes:
         Authorization:
-            scheme: bearer
-            type: http
-        JWT:
             scheme: bearer
             type: http
