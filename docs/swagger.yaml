@@ -165,6 +165,37 @@ paths:
                     Authorization: []
             summary: Delete session token (log out)
     /transactions:
+        get:
+            tags:
+                - transactions
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            examples:
+                                Transaction history:
+                                    value:
+                                        name: Mari Maasikas
+                                        transactions:
+                                            -
+                                                senderName: Mari Maasikas
+                                                accountFrom: 8b9a7cfefd4d642f9a6be0ca537f5b6ec83
+                                                receiverName: Karl Kaalikas
+                                                accountTo: 8b9844e7ca913f1aae49e0223101068989e
+                                                amount: 1500
+                                                createdAt: '2020-10-26T09:16:02.164Z'
+                                            -
+                                                senderName: Mari Maasikas
+                                                accountFrom: 8b9a7cfefd4d642f9a6be0ca537f5b6ec83
+                                                receiverName: Karl Kaalikas
+                                                accountTo: 8b9844e7ca913f1aae49e0223101068989e
+                                                amount: 1800
+                                                createdAt: '2020-10-26T09:24:40.289Z'
+                    description: OK
+            security:
+                -
+                    Authorization: []
+            summary: Get user`s transaction history
         post:
             requestBody:
                 content:

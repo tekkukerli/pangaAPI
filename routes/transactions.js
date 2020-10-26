@@ -260,4 +260,31 @@ router.get('/jwks', async (req,res, next) => {
     return res.send(keystore.toJSON())
 })
 
+//Get transaction history
+router.get('/',verifyToken, async (req, res, next) => {
+
+    //Get user object from DB
+    const user = await userModel.findOne({_id: req.userId})
+
+
+    //Get user`s transactions
+    const transactions = await transactionModel.find({userId: req.userId})
+
+    res.status(200).send( {
+        name: user.name,
+        transactions: transactions
+
+        /*
+            senderName: transactions.senderName,
+            accountFrom: transactions.accountFrom,
+            receiverName: transactions.receiverName,
+            accountTo: transactions.accountTo,
+            amount: transactions.amount,
+            createdAt: transactions.createdAt
+        */
+
+    })
+
+})
+
 module.exports = router
