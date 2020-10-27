@@ -11,7 +11,7 @@ module.exports = mongoose.model('Account', mongoose.Schema({
         }
     },
     userId :  { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-    balance:  { type: Number, required: true, minlength: 0, default: 10000},
+    balance:  { type: Number, required: true, minlength: 0, default: 100000},
     currency: { type: String, required: true, default: 'EUR'}
 }, {
     //Transform _id to id

@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 
 router.post('/', async (req, res) => {
 
-    //Make sure credidentials are given and correct
+    //Make sure credentials are given and correct
     if(typeof req.body.name === "undefined" || req.body.name.length < 2 || req.body.name.length > 50) {
       res.status(400).send({ error: "Invalid name" })
         return
