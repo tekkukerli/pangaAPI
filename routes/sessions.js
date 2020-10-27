@@ -27,7 +27,7 @@ router.post('/', async(req, res, next) => {
     })
 
     //Return token to user
-    return res.status(200).json({token: session._id})
+    return res.status(201).json({token: session._id})
 })
 
 // Log out 
